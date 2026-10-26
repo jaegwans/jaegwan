@@ -40,9 +40,6 @@ function Home() {
             <h2>jaegwan.com</h2>
             <StyledLink href="https://blog.jaegwan.com">blog</StyledLink>
             <StyledLink href="https://github.com/jaegwans">github</StyledLink>
-            <StyledLink href="https://docs.google.com/document/d/1D5oPFkMqpe1dYCPoW6LAHp9gBBHgHQtdWg11ADhVP1A/edit?usp=sharing">
-                resume
-            </StyledLink>
 
             <StyledSection>
                 <h3>Projects</h3>
