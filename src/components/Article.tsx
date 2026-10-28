@@ -6,11 +6,12 @@ type Props = {
     title: string;
     description: string;
     date: string;
+    links?: { label: string; href: string }[];
     children: React.ReactNode;
 };
 
 // 글 페이지 공통 레이아웃
-function Article({ title, description, date, children }: Props) {
+function Article({ title, description, date, links, children }: Props) {
     return (
         <>
             <Head>
@@ -25,6 +26,15 @@ function Article({ title, description, date, children }: Props) {
                 </Link>
                 <h1>{title}</h1>
                 <p className="date">{date}</p>
+                {links && (
+                    <p className="links">
+                        {links.map((l) => (
+                            <a key={l.href} href={l.href}>
+                                {l.label} →
+                            </a>
+                        ))}
+                    </p>
+                )}
                 <div className="body">{children}</div>
                 <footer>
                     <Link href="/">홈</Link> · <Link href="/privacy">개인정보처리방침</Link>
@@ -62,6 +72,16 @@ const StyledArticle = styled.article`
         margin-top: 0.5rem;
         color: #8a8a8a;
         font-size: 0.9rem;
+    }
+    .links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem 1.2rem;
+        margin-top: 0.75rem;
+        font-size: 0.95rem;
+    }
+    .links a {
+        text-decoration: none;
     }
     .body {
         margin-top: 2.5rem;
