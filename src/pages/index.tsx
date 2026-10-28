@@ -1,6 +1,8 @@
+import type { InferGetStaticPropsType } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import styled from 'styled-components';
+import { getBlogPosts, REVALIDATE } from '../lib/feeds';
 
 const projects = [
     {
@@ -10,14 +12,31 @@ const projects = [
         desc: '생년월일시로 사주 오행을 계산해, 100대 명산 중 나에게 모자란 기운을 채워줄 산을 추천하는 모바일웹. 친구와 매칭률도 볼 수 있어요.',
     },
     {
+        name: 'nocotine',
+        href: '/projects/nocotine',
+        desc: '금연한 시간, 아낀 돈, 몸의 회복 단계를 실시간으로 보여주고 가까운 금연 클리닉을 찾아주는 React Native 앱.',
+    },
+    {
+        name: 'fourcutbox',
+        href: '/projects/fourcutbox',
+        desc: '네컷 사진을 모아 보관하고 근처 사진관을 지도로 찾는 앱. React Native CLI로 만들고 있어요.',
+    },
+    {
         name: 'coflix',
+        href: '/projects/coflix',
         site: 'https://coflix.jaegwan.com',
-        desc: '개발자 취준생에게 꼭 필요한 정보만 모아둔 사이트',
+        desc: '개발 공부 영상, 오늘의 백준 문제, 합격자 이력서를 넷플릭스처럼 한 화면에 모은 개발자 취준생용 사이트.',
+    },
+    {
+        name: 'WeatherCoordi',
+        href: '/projects/weathercoordi',
+        desc: '현재 위치의 기온에 맞춰 오늘 입을 옷을 추천하고, 날씨에 어울리는 노래까지 이어주는 앱.',
     },
     {
         name: 'minesweeper',
+        href: '/projects/minesweeper',
         site: 'https://minesweeper.jaegwan.com',
-        desc: '브라우저에서 바로 하는 지뢰찾기',
+        desc: 'React와 Redux Toolkit으로 만든 브라우저 지뢰찾기. 빈칸을 한 번에 여는 BFS를 직접 구현했어요.',
     },
 ];
 
@@ -27,31 +46,39 @@ const notes = [
     { title: '산을 고르는 점수 공식', href: '/notes/mountain-score' },
 ];
 
-function Home() {
+export async function getStaticProps() {
+    const posts = await getBlogPosts();
+    return { props: { posts: posts.slice(0, 5) }, revalidate: REVALIDATE };
+}
+
+function Home({ posts }: InferGetStaticPropsType<typeof getStaticProps>) {
     return (
         <StyledHome>
             <Head>
                 <title>jaegwan.com</title>
                 <meta
                     name="description"
-                    content="개발자 jaegwan의 홈. Vibe Mountain 등 직접 만든 서비스와 만들면서 정리한 글을 모아둡니다."
+                    content="개발자 jaegwan의 홈. Vibe Mountain, nocotine, coflix 등 직접 만든 앱과 웹 서비스, 만들면서 정리한 글을 모아둡니다."
                 />
             </Head>
             <h2>jaegwan.com</h2>
-            <StyledLink href="https://blog.jaegwan.com">blog</StyledLink>
-            <StyledLink href="https://github.com/jaegwans">github</StyledLink>
+            <nav className="top">
+                <StyledLink href="/blog">blog</StyledLink>
+                <StyledLink href="/github">github</StyledLink>
+            </nav>
 
             <StyledSection>
                 <h3>Projects</h3>
                 {projects.map((p) => (
                     <div className="card" key={p.name}>
                         <div className="title">
-                            {p.href ? <Link href={p.href}>{p.name}</Link> : <a href={p.site}>{p.name}</a>}
+                            <Link href={p.href}>{p.name}</Link>
                         </div>
                         <p>{p.desc}</p>
-                        <a className="site" href={p.site}>
-                            {p.site.replace('https://', '')} →
-                        </a>
+                        <div className="links">
+                            <Link href={p.href}>만든 이야기 →</Link>
+                            {p.site && <a href={p.site}>{p.site.replace('https://', '')} →</a>}
+                        </div>
                     </div>
                 ))}
             </StyledSection>
@@ -66,6 +93,22 @@ function Home() {
                     ))}
                 </ul>
             </StyledSection>
+
+            {posts.length > 0 && (
+                <StyledSection>
+                    <h3>Blog</h3>
+                    <ul>
+                        {posts.map((post) => (
+                            <li key={post.link}>
+                                <a href={post.link}>{post.title}</a>
+                            </li>
+                        ))}
+                    </ul>
+                    <Link className="all" href="/blog">
+                        블로그 글 전체 보기 →
+                    </Link>
+                </StyledSection>
+            )}
 
             <footer>
                 <Link href="/privacy">개인정보처리방침</Link>
@@ -87,6 +130,10 @@ const StyledHome = styled.div`
     padding: 0 1rem 4rem;
     a {
         text-decoration: none;
+    }
+    nav.top {
+        display: flex;
+        gap: 2rem;
     }
     footer a {
         color: #8a8a8a;
@@ -128,7 +175,18 @@ const StyledSection = styled.section`
         line-height: 1.6;
         margin: 0.4rem 0;
     }
-    .site {
+    .links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.3rem 1rem;
+        font-size: 0.9rem;
+    }
+    .links a {
+        color: #2f5d50;
+    }
+    .all {
+        display: inline-block;
+        margin-top: 0.75rem;
         color: #2f5d50;
         font-size: 0.9rem;
     }
